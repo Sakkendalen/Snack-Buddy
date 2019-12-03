@@ -1,78 +1,121 @@
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import {
-  Image,
-  Platform,
-  ScrollView,
+  TextInput,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  AsyncStorage,
 } from 'react-native';
 
-import { MonoText } from '../components/StyledText';
+export default class AddScreen extends React.Component {
 
-export default function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}>
-        <View style={styles.welcomeContainer}>
-          <Image
-            source={
-              __DEV__
-                ? require('../assets/images/robot-dev.png')
-                : require('../assets/images/robot-prod.png')
-            }
-            style={styles.welcomeImage}
-          />
-        </View>
+  constructor(props){
+    super(props);
+    this.state = {
+      lastKey: 0,
+      keysRounded: false,
+      keys: [],
+      fetchedItems: []
+    }
+  }
 
-        <View style={styles.getStartedContainer}>
-          <DevelopmentModeNotice />
+  async componentDidMount(){
+    try{
 
-          <Text style={styles.getStartedText}>Get started by opening</Text>
+      const checkkeys =  await AsyncStorage.getAllKeys()
+      this.setState({keys: checkkeys, maxKeys: 10})
 
-          <View
-            style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-            <MonoText>screens/HomeScreen.js</MonoText>
-          </View>
+      if(this.state.keys.length < this.state.maxKeys){
+        var initKeys = []
+        for(var loop=0; loop < this.state.maxKeys; loop++){
+          initKeys.push('Key'+loop)
+        }
+        this.setState({keys: initKeys})
+      }
+    } catch (error) {
+      console.log('error mounting')
+      console.log(error)
+    }
+  }
 
-          <Text style={styles.getStartedText}>
-            Change this text and your app will automatically reload.
-          </Text>
-        </View>
+  _storeData = async (name) => {
+    try {
+      if(this.state.username != ""){
+        if(this.state.lastKey == this.state.maxKeys-1){
+          await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], ''+name)
+          this.setState({lastKey: 0, keysRounded: true})
+        }
+        else{
+          if(this.state.keysRounded){
+            this.setState({keysRounded: false})
+          }
+          await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], ''+name)
+          this.setState({lastKey: this.state.lastKey+1})
+        }
+        this.textInput.clear()
+        this.setState({username: ""})
+      }
+    } catch (error) {
+      console.log('error saving')
+      console.log(error)
+    }
+  };
 
-        <View style={styles.helpContainer}>
-          <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-            <Text style={styles.helpLinkText}>
-              Help, it didn’t automatically reload!
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
 
-      <View style={styles.tabBarInfoContainer}>
-        <Text style={styles.tabBarInfoText}>
-          This is a tab bar. You can edit it in:
-        </Text>
+  render(){
+    return (
+      <View style={styles.container}>
+        <TextInput ref={input => { this.textInput = input }} 
+        onChangeText={(username) => this.setState({username})}
+        style={styles.txtInp}/>
 
-        <View
-          style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-          <MonoText style={styles.codeHighlightText}>
-            navigation/MainTabNavigator.js
-          </MonoText>
-        </View>
+        <TouchableOpacity onPress={() => this._storeData(this.state.username)} style={styles.Btn}>
+          <Text style={styles.buttonText}>Save</Text>
+        </TouchableOpacity>
+
       </View>
-    </View>
-  );
+
+      
+    );
+  }
 }
 
-HomeScreen.navigationOptions = {
+AddScreen.navigationOptions = {
   header: null,
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  Btn: {
+    borderWidth:1,
+    borderColor:'rgba(0,0,0,0.2)',
+    alignItems:'center',
+    justifyContent:'center',
+    backgroundColor: '#ccccff',
+    marginHorizontal: 10,
+    marginVertical: 10,
+    width: 100
+  },
+  buttonText: {
+    fontSize: 20,
+    color: 'black',
+  },
+  txtInp: {
+    backgroundColor: '#ededed',
+    height: 40,
+    width: 200
+  },
+});
+
+
+/*
 function DevelopmentModeNotice() {
   if (__DEV__) {
     const learnMoreButton = (
@@ -108,12 +151,7 @@ function handleHelpPress() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  developmentModeText: {
+ developmentModeText: {
     marginBottom: 20,
     color: 'rgba(0,0,0,0.4)',
     fontSize: 14,
@@ -195,4 +233,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2e78b7',
   },
-});
+ */

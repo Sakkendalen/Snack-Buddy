@@ -3,9 +3,9 @@ import { Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
-import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import AddScreen from '../screens/AddScreen';
+import ViewScreen from '../screens/ViewScreen';
+import CategoryScreen from '../screens/CategoryScreen';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -14,20 +14,20 @@ const config = Platform.select({
 
 const HomeStack = createStackNavigator(
   {
-    Home: HomeScreen,
+    Home: AddScreen,
   },
   config
 );
 
 HomeStack.navigationOptions = {
-  tabBarLabel: 'Home',
+  tabBarLabel: 'Add',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
       name={
         Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
+          ? `ios-add-circle${focused ? '' : '-outline'}`
+          : 'md-add-circle'
       }
     />
   ),
@@ -37,15 +37,15 @@ HomeStack.path = '';
 
 const LinksStack = createStackNavigator(
   {
-    Links: LinksScreen,
+    Links: ViewScreen,
   },
   config
 );
 
 LinksStack.navigationOptions = {
-  tabBarLabel: 'Links',
+  tabBarLabel: 'View',
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-pie' : 'md-pie'} />
   ),
 };
 
@@ -53,15 +53,15 @@ LinksStack.path = '';
 
 const SettingsStack = createStackNavigator(
   {
-    Settings: SettingsScreen,
+    Settings: CategoryScreen,
   },
   config
 );
 
 SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
+  tabBarLabel: 'Categories',
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-pricetag' : 'md-pricetag'} />
   ),
 };
 
