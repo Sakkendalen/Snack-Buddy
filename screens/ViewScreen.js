@@ -48,7 +48,7 @@ export default class ViewScreen extends React.Component {
       let items = []
 
       for(var key of keyvalues){
-        const item = await AsyncStorage.getItem(''+key)
+        const item = JSON.parse(await AsyncStorage.getItem(''+key))
         items.push(item)
       }
       items.sort((a,b) => b.score - a.score)
@@ -106,7 +106,9 @@ export default class ViewScreen extends React.Component {
               {this.state.fetchedItems.map((item, index) => {
                 return (
                     <View key={index} style={styles.listcont}>
-                      <Text style={{flex: 1, alignSelf: 'center'}}>Name: {item}</Text>
+                      <Text style={{flex: 1, alignSelf: 'flex-start'}}>Name: {item.name}</Text>
+                      <Text style={{flex: 1, alignSelf: 'center'}}>Cost: {item.cost}</Text>
+                      <Text style={{flex: 1, alignSelf: 'flex-end'}}>Category: {item.categ}</Text>
                     </View>
                 )
               })}

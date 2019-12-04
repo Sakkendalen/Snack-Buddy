@@ -9,6 +9,8 @@ import {
   AsyncStorage,
 } from 'react-native';
 
+import { SnackItem } from '../components/SnackItem.js'
+
 export default class AddScreen extends React.Component {
 
   constructor(props){
@@ -40,22 +42,30 @@ export default class AddScreen extends React.Component {
     }
   }
 
-  _storeData = async (name) => {
+  _storeData = async (name, cost, cat) => {
     try {
       if(this.state.username != ""){
         if(this.state.lastKey == this.state.maxKeys-1){
-          await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], ''+name)
+
+          var objToSave = new SnackItem(name, cost, cat)
+
+          await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], JSON.stringify(objToSave))
           this.setState({lastKey: 0, keysRounded: true})
         }
         else{
           if(this.state.keysRounded){
             this.setState({keysRounded: false})
           }
-          await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], ''+name)
+
+          var objToSave = new SnackItem(name, cost, cat)
+
+          await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], JSON.stringify(objToSave))
           this.setState({lastKey: this.state.lastKey+1})
         }
-        this.textInput.clear()
-        this.setState({username: ""})
+        this.nameinput.clear()
+        this.costinput.clear()
+        this.categinput.clear()
+        this.setState({snackName: "", SnackCost: "", SnackCat: ""})
       }
     } catch (error) {
       console.log('error saving')
@@ -67,11 +77,24 @@ export default class AddScreen extends React.Component {
   render(){
     return (
       <View style={styles.container}>
-        <TextInput ref={input => { this.textInput = input }} 
-        onChangeText={(username) => this.setState({username})}
-        style={styles.txtInp}/>
 
-        <TouchableOpacity onPress={() => this._storeData(this.state.username)} style={styles.Btn}>
+        <Text style={styles.buttonText}>Snack Name:</Text>
+        <TextInput ref={input => { this.nameinput = input }} 
+        onChangeText={(snackName) => this.setState({snackName})}
+        style={styles.input}/>
+
+        <Text style={styles.buttonText}>Snack Cost:</Text>
+        <TextInput ref={input => { this.costinput = input }}
+        keyboardType='decimal-pad'
+        onChangeText={(SnackCost) => this.setState({SnackCost})}
+        style={styles.input}/>
+
+        <Text style={styles.buttonText}>Snack Category:</Text>
+        <TextInput ref={input => { this.categinput = input }} 
+        onChangeText={(SnackCat) => this.setState({SnackCat})}
+        style={styles.input}/>
+
+        <TouchableOpacity onPress={() => this._storeData(this.state.snackName, this.state.SnackCost, this.state.SnackCat)} style={styles.Btn}>
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
 
@@ -107,7 +130,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'black',
   },
-  txtInp: {
+  input: {
+    marginBottom: 10,
     backgroundColor: '#ededed',
     height: 40,
     width: 200
