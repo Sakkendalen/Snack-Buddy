@@ -2,6 +2,7 @@ import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import {
   TextInput,
+  Picker,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -64,7 +65,6 @@ export default class AddScreen extends React.Component {
         }
         this.nameinput.clear()
         this.costinput.clear()
-        this.categinput.clear()
         this.setState({snackName: "", SnackCost: "", SnackCat: ""})
       }
     } catch (error) {
@@ -90,9 +90,14 @@ export default class AddScreen extends React.Component {
         style={styles.input}/>
 
         <Text style={styles.buttonText}>Snack Category:</Text>
-        <TextInput ref={input => { this.categinput = input }} 
-        onChangeText={(SnackCat) => this.setState({SnackCat})}
-        style={styles.input}/>
+        <Picker
+          selectedValue={this.state.SnackCat}
+          style={styles.input}
+          onValueChange={(SnackCat) => this.setState({SnackCat})}>
+          <Picker.Item label="Sipsit" value="Sipsit" />
+          <Picker.Item label="Suklaat" value="Suklaat" />
+          <Picker.Item label="Pähkinät" value="Pähkinät" />
+        </Picker>
 
         <TouchableOpacity onPress={() => this._storeData(this.state.snackName, this.state.SnackCost, this.state.SnackCat)} style={styles.Btn}>
           <Text style={styles.buttonText}>Save</Text>
