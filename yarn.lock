@@ -5619,6 +5619,11 @@ react-native-gesture-handler@~1.3.0:
     invariant "^2.2.2"
     prop-types "^15.5.10"
 
+react-native-pie@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-pie/-/react-native-pie-0.6.1.tgz#6c16d967ca37b0f54abee822a5752edd81dc51ed"
+  integrity sha512-3oT4pwuD+qIkLauavJQMR7WBPlL3N7IqruuFwg2bow80SZR4dOF65oimhzPtOrLVLIev8b99PATagbeNsfb6jw==
+
 react-native-platform-touchable@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/react-native-platform-touchable/-/react-native-platform-touchable-1.1.1.tgz#fde4acc65eea585d28b164d0c3716a42129a68e4"

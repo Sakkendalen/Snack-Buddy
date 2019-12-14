@@ -7,6 +7,7 @@ import {
   Text,
   AsyncStorage
 } from 'react-native';
+import Pie from 'react-native-pie';
 import AddScreen from './AddScreen';
 
 export default class ViewScreen extends React.Component {
@@ -100,20 +101,13 @@ export default class ViewScreen extends React.Component {
   render(){
     return (
       <View style={styles.container}>
-        <View style={styles.list}>
-          <ScrollView>
 
-              {this.state.fetchedItems.map((item, index) => {
-                return (
-                    <View key={index} style={styles.listcont}>
-                      <Text style={{flex: 1, alignSelf: 'flex-start'}}>Name: {item.name}</Text>
-                      <Text style={{flex: 1, alignSelf: 'center'}}>Cost: {item.cost}</Text>
-                      <Text style={{flex: 1, alignSelf: 'flex-end'}}>Category: {item.categ}</Text>
-                    </View>
-                )
-              })}
-              
-          </ScrollView>
+        <View style={styles.list}>
+          <Pie
+            radius={70}
+            series={[56, 11, 77]}
+            colors={['yellow', 'green', 'orange']}
+          />
         </View>
 
         <View style={styles.inputArea}>
@@ -169,7 +163,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     backgroundColor: '#fff',
-    alignItems: 'stretch',
+    alignItems: 'center',
   },
   listcont: {
     flex: 1,
@@ -181,3 +175,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'orange',
   },
 });
+
+
+/*
+<View style={styles.list}>
+          <ScrollView>
+
+              {this.state.fetchedItems.map((item, index) => {
+                return (
+                    <View key={index} style={styles.listcont}>
+                      <Text style={{flex: 1, alignSelf: 'flex-start'}}>Name: {item.name}</Text>
+                      <Text style={{flex: 1, alignSelf: 'center'}}>Cost: {item.cost}</Text>
+                      <Text style={{flex: 1, alignSelf: 'flex-end'}}>Category: {item.categ}</Text>
+                    </View>
+                )
+              })}
+              
+          </ScrollView>
+        </View>
+*/
