@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import AddScreen from './AddScreen';
 import { VictoryPie } from 'victory-native';
+import { Svg } from 'react-native-svg'
 
 export default class ViewScreen extends React.Component {
 
@@ -24,55 +25,7 @@ export default class ViewScreen extends React.Component {
   }
 
   async componentDidMount(){
-    try {
-
-      const keyvalues = await AsyncStorage.getAllKeys()
-
-      let items = []
-      let categAdded = []
-      let categoryCosts= []
-      let categories = 0
-      let totalcost = 0
-
-      //console.log(keyvalues)
-
-      //get items from asyncstorage and save them to items array
-      for(var key of keyvalues){
-        const item = JSON.parse(await AsyncStorage.getItem(''+key))
-        items.push(item)
-      }
-
-      //Go through items and add categories and sum up total cost
-      for(var item of items){
-        if(!this.eleContainsInArray(categAdded,item.categ)){
-          categAdded.push(item.categ)
-          categories++
-        }
-        totalcost += parseFloat(item.cost)
-      }
-
-      //go through categories and items and sum up category total cost
-      for(let a = 0; a < categories; a++){
-
-        let categcost = 0
-
-        for(var item of items){
-          if(item.categ == categAdded[a]){
-            categcost += parseFloat(item.cost) 
-          }
-        }
-        categoryCosts.push(Math.round(categcost/totalcost*100))
-      }
-      // console.log(categoryCosts)
-    
-      this.setState({CostsbyCateg: categoryCosts})
-      this.setState({fetchedItems: items})
-
-
-    } catch (error) {
-      console.log('error loading')
-      console.log(error)
-    }
+    this._retrieveData();
   }
 
   _retrieveData = async () => {
@@ -103,7 +56,7 @@ export default class ViewScreen extends React.Component {
         totalcost += parseFloat(item.cost)
       }
 
-      //go through categories and items and sum up category total cost
+      //go through categories and items and sum up category total cost by percentage
       for(let a = 0; a < categories; a++){
 
         let categcost = 0
@@ -166,9 +119,32 @@ export default class ViewScreen extends React.Component {
       <View style={styles.container}>
 
         <View style={styles.list}>
-          <VictoryPie
-            data={this.state.CostsbyCateg}
-          />
+          <Svg>
+            <VictoryPie
+              data={this.state.CostsbyCateg}
+              width={300}
+              events={[{
+                target: "data",
+                eventHandlers: {
+                  onPressIn: () => {
+                    return [
+                      {
+                        target: "data",
+                        mutation: ({ style }) => {
+                          return style.fill === "#c43a31" ? null : { style: { fill: "#c43a31" } };
+                        }
+                      }, {
+                        target: "labels",
+                        mutation: ({ text }) => {
+                          return text === "clicked" ? null : { text: "clicked" };
+                        }
+                      }
+                    ];
+                  }
+                }
+              }]}
+            />
+          </Svg>
         </View>
 
         <View style={styles.inputArea}>
@@ -248,7 +224,7 @@ const styles = StyleSheet.create({
   },
   list:{
     flex:1,
-    flexDirection: 'column',
+    flexDirection: 'row',
     marginTop: 30,
     marginBottom: 10,
     marginLeft: 10,

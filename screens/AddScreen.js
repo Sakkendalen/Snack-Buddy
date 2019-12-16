@@ -21,7 +21,7 @@ export default class AddScreen extends React.Component {
       keysRounded: false,
       keys: [],
       fetchedItems: [],
-      SnackCat: "Sipsit"
+      SnackCat: "Chips"
     }
   }
 
@@ -66,7 +66,7 @@ export default class AddScreen extends React.Component {
         }
         this.nameinput.clear()
         this.costinput.clear()
-        this.setState({snackName: "", SnackCost: "", SnackCat: "Sipsit"})
+        this.setState({snackName: "", SnackCost: "", SnackCat: "Chips"})
       }
     } catch (error) {
       console.log('error saving')
@@ -95,9 +95,9 @@ export default class AddScreen extends React.Component {
           selectedValue={this.state.SnackCat}
           style={styles.input}
           onValueChange={(SnackCat) => this.setState({SnackCat})}>
-          <Picker.Item label="Sipsit" value="Sipsit" />
-          <Picker.Item label="Suklaat" value="Suklaat" />
-          <Picker.Item label="Pähkinät" value="Pähkinät" />
+          <Picker.Item label="Chips" value="Chips" />
+          <Picker.Item label="Sweets" value="Sweets" />
+          <Picker.Item label="Nuts" value="Nuts" />
         </Picker>
 
         <TouchableOpacity onPress={() => this._storeData(this.state.snackName, this.state.SnackCost, this.state.SnackCat)} style={styles.Btn}>
