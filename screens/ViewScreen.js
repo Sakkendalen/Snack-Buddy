@@ -18,25 +18,60 @@ export default class ViewScreen extends React.Component {
       lastKey: 0,
       keysRounded: false,
       keys: [],
-      fetchedItems: []
+      fetchedItems: [],
+      CostsbyCateg: []
     }
+    this.eleContainsInArray = this.eleContainsInArray.bind(this);
   }
 
   async componentDidMount(){
-    try{
+    try {
 
-      const checkkeys =  await AsyncStorage.getAllKeys()
-      this.setState({keys: checkkeys, maxKeys: 10})
+      const keyvalues = await AsyncStorage.getAllKeys()
 
-      if(this.state.keys.length < this.state.maxKeys){
-        var initKeys = []
-        for(var loop=0; loop < this.state.maxKeys; loop++){
-          initKeys.push('Key'+loop)
-        }
-        this.setState({keys: initKeys})
+      let items = []
+      let categAdded = []
+      let categoryCosts= []
+      let categories = 0
+      let totalcost = 0
+
+      //console.log(keyvalues)
+
+      //get items from asyncstorage and save them to items array
+      for(var key of keyvalues){
+        const item = JSON.parse(await AsyncStorage.getItem(''+key))
+        items.push(item)
       }
+
+      //Go through items and add categories and sum up total cost
+      for(var item of items){
+        if(!this.eleContainsInArray(categAdded,item.categ)){
+          categAdded.push(item.categ)
+          categories++
+        }
+        totalcost += parseFloat(item.cost)
+      }
+
+      //go through categories and items and sum up category total cost
+      for(let a = 0; a < categories; a++){
+
+        let categcost = 0
+
+        for(var item of items){
+          if(item.categ == categAdded[a]){
+            categcost += parseFloat(item.cost) 
+          }
+        }
+        categoryCosts.push(Math.round(categcost/totalcost*100))
+      }
+      // console.log(categoryCosts)
+    
+      this.setState({CostsbyCateg: categoryCosts})
+      this.setState({fetchedItems: items})
+
+
     } catch (error) {
-      console.log('error mounting')
+      console.log('error loading')
       console.log(error)
     }
   }
@@ -47,14 +82,45 @@ export default class ViewScreen extends React.Component {
       const keyvalues = await AsyncStorage.getAllKeys()
 
       let items = []
+      let categAdded = []
+      let categoryCosts= []
+      let categories = 0
+      let totalcost = 0
 
+      //console.log(keyvalues)
+
+      //get items from asyncstorage and save them to items array
       for(var key of keyvalues){
         const item = JSON.parse(await AsyncStorage.getItem(''+key))
         items.push(item)
       }
-      items.sort((a,b) => b.score - a.score)
+
+      //Go through items and add categories and sum up total cost
+      for(var item of items){
+        if(!this.eleContainsInArray(categAdded,item.categ)){
+          categAdded.push(item.categ)
+          categories++
+        }
+        totalcost += parseFloat(item.cost)
+      }
+
+      //go through categories and items and sum up category total cost
+      for(let a = 0; a < categories; a++){
+
+        let categcost = 0
+
+        for(var item of items){
+          if(item.categ == categAdded[a]){
+            categcost += parseInt(item.cost) 
+          }
+        }
+        categoryCosts.push(Math.round(categcost/totalcost*100))
+      }
+      // console.log(categoryCosts)
+    
+      this.setState({CostsbyCateg: categoryCosts})
       this.setState({fetchedItems: items})
-      //console.log(this.state.fetchedItems)
+
 
     } catch (error) {
       console.log('error loading')
@@ -70,22 +136,16 @@ export default class ViewScreen extends React.Component {
     //     });
     // });
   }
-    
-    // try {
-    //   if(this.state.keysRounded){
-    //     console.log("Key: " +this.state.keys[maxKeys])
-    //     const value = await AsyncStorage.getItem(''+this.state.keys[maxKeys])
-    //     this.setState({keysRounded: false})
-    //   }
-    //   else{
-    //     console.log("KeyTest: " +this.state.keys[this.state.lastKey-1])
-    //     const value = await AsyncStorage.getItem(''+this.state.keys[this.state.lastKey-1])
-    //   }
-    // } catch (error) {
-    //   console.log('error loading')
-    //   console.log(error)
-    // }
-    //};
+
+  eleContainsInArray(arr,element){
+    if(arr != null && arr.length >0){
+        for(var i=0;i<arr.length;i++){
+            if(arr[i] == element)
+                return true;
+        }
+    }
+    return false;
+  } 
 
   _clearData = async () => {
     console.log('clear clicked')
@@ -98,21 +158,36 @@ export default class ViewScreen extends React.Component {
     }
   }
 
+  _getSeries = () => {
+    return this.state.CostsbyCateg
+  }
+
   render(){
     return (
       <View style={styles.container}>
 
         <View style={styles.list}>
           <Pie
-            radius={70}
-            series={[56, 11, 77]}
+            radius={100}
+            series={this.state.CostsbyCateg}
             colors={['yellow', 'green', 'orange']}
           />
+          <TouchableOpacity style={styles.Btnyel}>
+          <Text style={styles.buttonText}>Pähkinät</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.Btngre}>
+          <Text style={styles.buttonText}>Suklaat</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.Btnora}>
+          <Text style={styles.buttonText}>Sipsit</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.inputArea}>
           <TouchableOpacity onPress={() => this._retrieveData()} style={styles.Btn}>
-          <Text style={styles.buttonText}>Load</Text>
+          <Text style={styles.buttonText}>Refresh</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => this._clearData()} style={styles.Btn}>
@@ -139,7 +214,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-end',
   },
   Btn: {
     borderWidth:1,
@@ -151,19 +226,50 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: 100
   },
+  Btnyel: {
+    borderWidth:1,
+    borderColor:'rgba(0,0,0,0.2)',
+    alignItems:'center',
+    justifyContent:'center',
+    backgroundColor: 'yellow',
+    marginHorizontal: 10,
+    marginVertical: 10,
+    width: 100
+  },
+  Btngre: {
+    borderWidth:1,
+    borderColor:'rgba(0,0,0,0.2)',
+    alignItems:'center',
+    justifyContent:'center',
+    backgroundColor: 'green',
+    marginHorizontal: 10,
+    marginVertical: 10,
+    width: 100
+  },
+  Btnora: {
+    borderWidth:1,
+    borderColor:'rgba(0,0,0,0.2)',
+    alignItems:'center',
+    justifyContent:'center',
+    backgroundColor: 'orange',
+    marginHorizontal: 10,
+    marginVertical: 10,
+    width: 100
+  },
   buttonText: {
     fontSize: 20,
     color: 'black',
   },
   list:{
     flex:1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     marginTop: 30,
     marginBottom: 10,
     marginLeft: 10,
     marginRight: 10,
     backgroundColor: '#fff',
     alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   listcont: {
     flex: 1,
