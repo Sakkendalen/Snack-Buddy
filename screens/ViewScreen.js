@@ -1,14 +1,13 @@
-import React from 'react';
+import React from "react";
 import { 
-  ScrollView, 
   StyleSheet, 
   View, 
   TouchableOpacity,
   Text,
   AsyncStorage
 } from 'react-native';
-import Pie from 'react-native-pie';
 import AddScreen from './AddScreen';
+import { VictoryPie } from 'victory-native';
 
 export default class ViewScreen extends React.Component {
 
@@ -114,7 +113,7 @@ export default class ViewScreen extends React.Component {
             categcost += parseInt(item.cost) 
           }
         }
-        categoryCosts.push(Math.round(categcost/totalcost*100))
+        categoryCosts.push({x: categAdded[a], y: Math.round(categcost/totalcost*100)})
       }
       // console.log(categoryCosts)
     
@@ -167,22 +166,9 @@ export default class ViewScreen extends React.Component {
       <View style={styles.container}>
 
         <View style={styles.list}>
-          <Pie
-            radius={100}
-            series={this.state.CostsbyCateg}
-            colors={['yellow', 'green', 'orange']}
+          <VictoryPie
+            data={this.state.CostsbyCateg}
           />
-          <TouchableOpacity style={styles.Btnyel}>
-          <Text style={styles.buttonText}>Pähkinät</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.Btngre}>
-          <Text style={styles.buttonText}>Suklaat</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.Btnora}>
-          <Text style={styles.buttonText}>Sipsit</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.inputArea}>

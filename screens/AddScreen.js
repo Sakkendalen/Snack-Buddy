@@ -20,7 +20,8 @@ export default class AddScreen extends React.Component {
       lastKey: 0,
       keysRounded: false,
       keys: [],
-      fetchedItems: []
+      fetchedItems: [],
+      SnackCat: "Sipsit"
     }
   }
 
@@ -65,7 +66,7 @@ export default class AddScreen extends React.Component {
         }
         this.nameinput.clear()
         this.costinput.clear()
-        this.setState({snackName: "", SnackCost: "", SnackCat: ""})
+        this.setState({snackName: "", SnackCost: "", SnackCat: "Sipsit"})
       }
     } catch (error) {
       console.log('error saving')
