@@ -1,11 +1,12 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import { createStackNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
 import AddScreen from '../screens/AddScreen';
 import ViewScreen from '../screens/ViewScreen';
 import CategoryScreen from '../screens/CategoryScreen';
+import ItemsScreen from '../screens/ItemsScreens'
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -67,12 +68,26 @@ SettingsStack.navigationOptions = {
 
 SettingsStack.path = '';
 
+const ItemsStack = createStackNavigator(
+  {
+    Settings: ItemsScreen,
+  },
+  config
+);
+
+//tabs
 const tabNavigator = createBottomTabNavigator({
   HomeStack,
   LinksStack,
   SettingsStack,
 });
 
+//tabs + other screens
+const AppNavigator = createStackNavigator({
+  Home: tabNavigator,
+  Items: ItemsStack
+});
+
 tabNavigator.path = '';
 
-export default tabNavigator;
+export default createAppContainer(AppNavigator);

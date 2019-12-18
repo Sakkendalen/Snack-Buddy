@@ -7,8 +7,10 @@ import {
   AsyncStorage
 } from 'react-native';
 import AddScreen from './AddScreen';
+import itemsScreen from './ItemsScreens'
 import { VictoryPie } from 'victory-native';
 import { Svg } from 'react-native-svg'
+import ItemsScreens from "./ItemsScreens";
 
 export default class ViewScreen extends React.Component {
 
@@ -114,11 +116,18 @@ export default class ViewScreen extends React.Component {
     return this.state.CostsbyCateg
   }
 
+  _openItemsCategory = (catName, items) => {
+    this.props.navigation.navigate('Items', {
+      category: catName + ' ' + items,
+      })
+  }
+
   render(){
+    const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
 
-        <View style={styles.list}>
+        <View style={styles.PieArea}>
           <Svg>
             <VictoryPie
               data={this.state.CostsbyCateg}
@@ -127,18 +136,11 @@ export default class ViewScreen extends React.Component {
                 target: "data",
                 eventHandlers: {
                   onPressIn: () => {
-                    return [
+                    return [ 
                       {
-                        target: "data",
-                        mutation: ({ style }) => {
-                          return style.fill === "#c43a31" ? null : { style: { fill: "#c43a31" } };
-                        }
-                      }, {
                         target: "labels",
-                        mutation: ({ text }) => {
-                          return text === "clicked" ? null : { text: "clicked" };
+                        mutation: ({ text }) => this._openItemsCategory(text, this.state.fetchedItems)
                         }
-                      }
                     ];
                   }
                 }
@@ -147,7 +149,7 @@ export default class ViewScreen extends React.Component {
           </Svg>
         </View>
 
-        <View style={styles.inputArea}>
+        <View style={styles.Btnarea}>
           <TouchableOpacity onPress={() => this._retrieveData()} style={styles.Btn}>
           <Text style={styles.buttonText}>Refresh</Text>
           </TouchableOpacity>
@@ -155,6 +157,7 @@ export default class ViewScreen extends React.Component {
           <TouchableOpacity onPress={() => this._clearData()} style={styles.Btn}>
           <Text style={styles.buttonText}>Clear All</Text>
           </TouchableOpacity>
+
         </View>
       </View>
     );
@@ -172,11 +175,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  inputArea:{
+  Btnarea:{
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   Btn: {
     borderWidth:1,
@@ -188,41 +191,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: 100
   },
-  Btnyel: {
-    borderWidth:1,
-    borderColor:'rgba(0,0,0,0.2)',
-    alignItems:'center',
-    justifyContent:'center',
-    backgroundColor: 'yellow',
-    marginHorizontal: 10,
-    marginVertical: 10,
-    width: 100
-  },
-  Btngre: {
-    borderWidth:1,
-    borderColor:'rgba(0,0,0,0.2)',
-    alignItems:'center',
-    justifyContent:'center',
-    backgroundColor: 'green',
-    marginHorizontal: 10,
-    marginVertical: 10,
-    width: 100
-  },
-  Btnora: {
-    borderWidth:1,
-    borderColor:'rgba(0,0,0,0.2)',
-    alignItems:'center',
-    justifyContent:'center',
-    backgroundColor: 'orange',
-    marginHorizontal: 10,
-    marginVertical: 10,
-    width: 100
-  },
   buttonText: {
     fontSize: 20,
     color: 'black',
   },
-  list:{
+  PieArea:{
     flex:1,
     flexDirection: 'row',
     marginTop: 30,
@@ -231,7 +204,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   listcont: {
     flex: 1,
