@@ -49,7 +49,7 @@ export default class AddScreen extends React.Component {
       if(this.state.username != ""){
         if(this.state.lastKey == this.state.maxKeys-1){
 
-          var objToSave = new SnackItem(name, cost, cat)
+          var objToSave = new SnackItem(name, cost, cat, this.state.keys[this.state.lastKey])
 
           await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], JSON.stringify(objToSave))
           this.setState({lastKey: 0, keysRounded: true})
@@ -59,7 +59,7 @@ export default class AddScreen extends React.Component {
             this.setState({keysRounded: false})
           }
 
-          var objToSave = new SnackItem(name, cost, cat)
+          var objToSave = new SnackItem(name, cost, cat, this.state.keys[this.state.lastKey])
 
           await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], JSON.stringify(objToSave))
           this.setState({lastKey: this.state.lastKey+1})

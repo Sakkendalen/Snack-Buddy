@@ -118,7 +118,8 @@ export default class ViewScreen extends React.Component {
 
   _openItemsCategory = (catName, items) => {
     this.props.navigation.navigate('Items', {
-      category: catName + ' ' + items,
+      category: catName,
+      data: items,
       })
   }
 
