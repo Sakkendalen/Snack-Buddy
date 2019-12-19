@@ -18,14 +18,13 @@ export default class ItemsScreens extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      data : [
-          {
-            title: 'Items',
-          }
-        ],
       items: this._itemsOfthisCateg(),
       modalVisible: false,
     }
+  }
+
+  componentDidMount(){
+    this.setState({items: this._itemsOfthisCateg()})
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -172,7 +171,6 @@ const styles = StyleSheet.create({
     margin: 5,
     alignItems:'center',
     justifyContent: 'center',
-    backgroundColor: '#ededed',
   },
   modalBtn: {
     alignSelf: 'center',
