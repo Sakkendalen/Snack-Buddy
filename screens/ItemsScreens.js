@@ -6,9 +6,12 @@ import {
   SafeAreaView, 
   ScrollView, 
   TouchableOpacity, 
-  AsyncStorage 
+  AsyncStorage,
+  Modal,
+  TextInput,
 } from 'react-native';
 import Constants from 'expo-constants';
+import { SnackItem } from '../components/SnackItem.js'
 
 export default class ItemsScreens extends React.Component {
 
@@ -21,8 +24,8 @@ export default class ItemsScreens extends React.Component {
           }
         ],
       items: this._itemsOfthisCateg(),
+      modalVisible: false,
     }
-    console.log(this.state.data2)
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -47,7 +50,6 @@ export default class ItemsScreens extends React.Component {
   }
 
   _deleteItem =  async (key) => {
-    console.log(key)
     let items = this.state.items
     let notDeletedItems = []
     try {
@@ -64,6 +66,22 @@ export default class ItemsScreens extends React.Component {
     }
   }
 
+  _showItemdata =  async (key, visible) => {
+    let item = JSON.parse(await AsyncStorage.getItem(""+key))
+    this.setState({snackName: item.name, SnackCost: item.cost, snackKey: key, snackCat: item.categ })
+    this.setState({modalVisible: visible});
+    console.log(item)
+  }
+
+  _alterItemData = async (key) => {
+    console.log(this.state.itemToAlter)
+
+    var objToSave = new SnackItem(this.state.snackName, this.state.SnackCost, this.state.snackCat, this.state.snackKey)
+
+    await AsyncStorage.setItem(''+this.state.snackKey, JSON.stringify(objToSave))
+    this.setState({modalVisible: false});
+  }
+
   Item({ title }) {
     return (
       <View style={styles.item}>
@@ -75,12 +93,52 @@ export default class ItemsScreens extends React.Component {
   render() {
     return (
       <SafeAreaView style={styles.container}>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={this.state.modalVisible}>
+          <View style={styles.modalcont}>
+            <View>
+            <Text style={styles.buttonText}>Snack Name:</Text>
+            <TextInput ref={input => { this.nameinput = input }} 
+            value={this.state.snackName}
+            onChangeText={(snackName) => this.setState({snackName})}
+            style={styles.input}/>
+
+            <Text style={styles.buttonText}>Snack Cost:</Text>
+            <TextInput ref={input => { this.costinput = input }}
+            value={this.state.SnackCost}
+            keyboardType='decimal-pad'
+            onChangeText={(SnackCost) => this.setState({SnackCost})}
+            style={styles.input}/>
+
+              <TouchableOpacity
+                onPress={() => this._alterItemData()}
+                style={styles.modalBtn}>
+                <Text style={styles.buttonText}>Save</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({modalVisible: !this.state.modalVisible});
+                }} 
+                style={styles.modalBtn}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         <ScrollView>
           {this.state.items.map((item, index) => {
             return (
                 <View key={index} style={styles.listcont}>
                   <Text style={{flex: 1, alignSelf: 'flex-start'}}>Name: {item.name}</Text>
                   <Text style={{flex: 1, alignSelf: 'flex-start'}}>Cost: {item.cost}</Text>
+                  <TouchableOpacity onPress={() => this._showItemdata(item.key, true)} style={styles.Btn}>
+                    <Text style={styles.buttonText}>Alter</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity onPress={() => this._deleteItem(item.key)} style={styles.Btn}>
                     <Text style={styles.buttonText}>Delete</Text>
                   </TouchableOpacity>
@@ -108,6 +166,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#ededed',
   },
+  modalcont: {
+    flex: 1,
+    flexDirection: 'row',
+    margin: 5,
+    alignItems:'center',
+    justifyContent: 'center',
+    backgroundColor: '#ededed',
+  },
+  modalBtn: {
+    alignSelf: 'center',
+    borderWidth:1,
+    borderColor:'rgba(0,0,0,0.2)',
+    backgroundColor: '#ccccff',
+    width: 100,
+    margin: 10
+  },
+  input: {
+    marginBottom: 10,
+    backgroundColor: '#ededed',
+    height: 40,
+    width: 200
+  },
+  buttonText: {
+    fontSize: 20,
+    color: 'black',
+  },
   item: {
     backgroundColor: '#f9c2ff',
     padding: 20,
@@ -119,8 +203,6 @@ const styles = StyleSheet.create({
     borderWidth:1,
     borderColor:'rgba(0,0,0,0.2)',
     backgroundColor: '#ccccff',
-    marginHorizontal: 10,
-    marginVertical: 10,
     width: 100
   },
   header: {
