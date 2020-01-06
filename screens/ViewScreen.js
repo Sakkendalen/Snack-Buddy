@@ -6,11 +6,11 @@ import {
   Text,
   AsyncStorage
 } from 'react-native';
-import AddScreen from './AddScreen';
+//import AddScreen from './AddScreen';
 import itemsScreen from './ItemsScreens'
 import { VictoryPie } from 'victory-native';
 import { Svg } from 'react-native-svg'
-import ItemsScreens from "./ItemsScreens";
+import { NavigationEvents } from 'react-navigation';
 
 export default class ViewScreen extends React.Component {
 
@@ -21,13 +21,22 @@ export default class ViewScreen extends React.Component {
       keysRounded: false,
       keys: [],
       fetchedItems: [],
-      CostsbyCateg: []
+      CostsbyCateg: [],
+      update: false
     }
     this.eleContainsInArray = this.eleContainsInArray.bind(this);
   }
 
   async componentDidMount(){
     this._retrieveData();
+  }
+
+  componentDidUpdate() {
+    if(this.state.update){
+      this._retrieveData();
+      console.log("comp updated!")
+      this.setState({update: false})
+    }
   }
 
   _retrieveData = async () => {
@@ -106,6 +115,7 @@ export default class ViewScreen extends React.Component {
     try {
       await AsyncStorage.clear()
       this.setState({lastKey: 0, keysRounded: false, fetchedItems: []})
+      this._retrieveData();
     } catch (error) {
       console.log('error loading')
       console.log(error)
@@ -127,7 +137,10 @@ export default class ViewScreen extends React.Component {
     const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
-
+        <NavigationEvents
+        onDidFocus={() => this.setState({ update: this.props.navigation.getParam('data', {}) })}
+      />
+      {
         <View style={styles.PieArea}>
           <Svg>
             <VictoryPie
@@ -149,6 +162,7 @@ export default class ViewScreen extends React.Component {
             />
           </Svg>
         </View>
+      }
 
         <View style={styles.Btnarea}>
           <TouchableOpacity onPress={() => this._retrieveData()} style={styles.Btn}>

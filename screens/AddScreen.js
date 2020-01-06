@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { SnackItem } from '../components/SnackItem.js'
+//import { ViewScreen } from './ViewScreen.js';
 
 export default class AddScreen extends React.Component {
 
@@ -53,6 +54,7 @@ export default class AddScreen extends React.Component {
 
           await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], JSON.stringify(objToSave))
           this.setState({lastKey: 0, keysRounded: true})
+          this.props.navigation.navigate('View', { update: true })
         }
         else{
           if(this.state.keysRounded){
@@ -63,6 +65,7 @@ export default class AddScreen extends React.Component {
 
           await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], JSON.stringify(objToSave))
           this.setState({lastKey: this.state.lastKey+1})
+          this.props.navigation.navigate('View', { update: true })
         }
         this.nameinput.clear()
         this.costinput.clear()
