@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import { SnackItem } from '../components/SnackItem.js'
-//import { ViewScreen } from './ViewScreen.js';
+import { NavigationEvents } from 'react-navigation';
 
 export default class AddScreen extends React.Component {
 
@@ -22,7 +22,8 @@ export default class AddScreen extends React.Component {
       keysRounded: false,
       keys: [],
       fetchedItems: [],
-      SnackCat: "Chips"
+      SnackCat: "Chips",
+      update: false
     }
   }
 
@@ -30,57 +31,93 @@ export default class AddScreen extends React.Component {
     try{
 
       const checkkeys =  await AsyncStorage.getAllKeys()
-      this.setState({keys: checkkeys, maxKeys: 10})
-
-      if(this.state.keys.length < this.state.maxKeys){
-        var initKeys = []
-        for(var loop=0; loop < this.state.maxKeys; loop++){
-          initKeys.push('Key'+loop)
-        }
-        this.setState({keys: initKeys})
+      console.log(checkkeys)
+      
+      console.log(checkkeys[checkkeys.length-1])
+      if(checkkeys[checkkeys.length-1] == 'undefined'){
+        this.setState({keys: checkkeys, lastKey: 0})
       }
+      else{
+        this.setState({keys: checkkeys, lastKey: checkkeys.length})
+      }
+
     } catch (error) {
       console.log('error mounting')
       console.log(error)
     }
   }
 
-  _storeData = async (name, cost, cat) => {
-    try {
-      if(this.state.username != ""){
-        if(this.state.lastKey == this.state.maxKeys-1){
-
-          var objToSave = new SnackItem(name, cost, cat, this.state.keys[this.state.lastKey])
-
-          await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], JSON.stringify(objToSave))
-          this.setState({lastKey: 0, keysRounded: true})
-          this.props.navigation.navigate('View', { update: true })
+  async componentDidUpdate() {
+    if(this.state.update){
+      try{
+        this.setState({update: false})
+        const checkkeys =  await AsyncStorage.getAllKeys()
+        console.log(checkkeys)
+        
+        console.log(checkkeys[checkkeys.length-1])
+        if(checkkeys[checkkeys.length-1] == 'undefined'){
+          this.setState({keys: checkkeys, lastKey: 0})
         }
         else{
-          if(this.state.keysRounded){
-            this.setState({keysRounded: false})
-          }
-
-          var objToSave = new SnackItem(name, cost, cat, this.state.keys[this.state.lastKey])
-
-          await AsyncStorage.setItem(''+this.state.keys[this.state.lastKey], JSON.stringify(objToSave))
-          this.setState({lastKey: this.state.lastKey+1})
-          this.props.navigation.navigate('View', { update: true })
+          this.setState({keys: checkkeys, lastKey: checkkeys.length})
         }
-        this.nameinput.clear()
-        this.costinput.clear()
-        this.setState({snackName: "", SnackCost: "", SnackCat: "Chips"})
+
+      } catch (error) {
+        console.log('error mounting')
+        console.log(error)
       }
+    }
+  }
+
+  _storeData = async (name, cost, cat) => {
+    try {
+      if(this.state.lastKey == 0){
+
+        var objToSave = new SnackItem(name, cost, cat, this.state.keys[this.state.lastKey])
+
+        await AsyncStorage.setItem('Key'+this.state.lastKey, JSON.stringify(objToSave))
+        this.setState({lastKey: this.state.lastKey+1})
+        this.props.navigation.navigate('View', { update: true })
+      }
+      else{
+
+        var objToSave = new SnackItem(name, cost, cat, this.state.keys[this.state.lastKey])
+
+        await AsyncStorage.setItem('Key'+this.state.lastKey, JSON.stringify(objToSave))
+        this.setState({lastKey: this.state.lastKey+1})
+        this.props.navigation.navigate('View', { update: true })
+      }
+      this.nameinput.clear()
+      this.costinput.clear()
+      this.setState({snackName: "", SnackCost: "", SnackCat: "Chips"})
+      
     } catch (error) {
       console.log('error saving')
       console.log(error)
     }
   };
 
+  _checkKeys = async () => {
+
+    try{
+      const checkkeys =  await AsyncStorage.getAllKeys()
+      console.log(checkkeys)
+      console.log(checkkeys[checkkeys.length-1])
+    } catch (error) {
+      console.log('error mounting')
+      console.log(error)
+    }
+
+  }
+
 
   render(){
     return (
       <View style={styles.container}>
+        <NavigationEvents
+        onDidFocus={() => this.setState({ update: this.props.navigation.getParam('data', {}) })}
+      />
+      { }
 
         <Text style={styles.buttonText}>Snack Name:</Text>
         <TextInput ref={input => { this.nameinput = input }} 
@@ -105,6 +142,9 @@ export default class AddScreen extends React.Component {
 
         <TouchableOpacity onPress={() => this._storeData(this.state.snackName, this.state.SnackCost, this.state.SnackCat)} style={styles.Btn}>
           <Text style={styles.buttonText}>Save</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => this._checkKeys()} style={styles.Btn}>
+          <Text style={styles.buttonText}>CheckKeys</Text>
         </TouchableOpacity>
 
       </View>

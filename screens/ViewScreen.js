@@ -114,6 +114,7 @@ export default class ViewScreen extends React.Component {
     console.log('clear clicked')
     try {
       await AsyncStorage.clear()
+      this.props.navigation.navigate('Add', { update: true })
       this.setState({lastKey: 0, keysRounded: false, fetchedItems: []})
       this._retrieveData();
     } catch (error) {
