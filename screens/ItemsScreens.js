@@ -43,7 +43,7 @@ export default class ItemsScreens extends React.Component {
         correctCateg.push(item)
       }
     }
-
+    console.log(correctCateg)
     return correctCateg
 
   }
@@ -51,6 +51,7 @@ export default class ItemsScreens extends React.Component {
   _deleteItem =  async (key) => {
     let items = this.state.items
     let notDeletedItems = []
+    console.log(key)
     try {
       await AsyncStorage.removeItem(key);
       for(let item of items){

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
   AsyncStorage,
+  Alert,
 } from 'react-native';
 
 import { SnackItem } from '../components/SnackItem.js'
@@ -31,9 +32,7 @@ export default class AddScreen extends React.Component {
     try{
 
       const checkkeys =  await AsyncStorage.getAllKeys()
-      console.log(checkkeys)
-      
-      console.log(checkkeys[checkkeys.length-1])
+
       if(checkkeys[checkkeys.length-1] == 'undefined'){
         this.setState({keys: checkkeys, lastKey: 0})
       }
@@ -70,32 +69,46 @@ export default class AddScreen extends React.Component {
   }
 
   _storeData = async (name, cost, cat) => {
-    try {
-      if(this.state.lastKey == 0){
-
-        var objToSave = new SnackItem(name, cost, cat, this.state.keys[this.state.lastKey])
-
-        await AsyncStorage.setItem('Key'+this.state.lastKey, JSON.stringify(objToSave))
-        this.setState({lastKey: this.state.lastKey+1})
-        this.props.navigation.navigate('View', { update: true })
+    console.log(name)
+    console.log(cost)
+    console.log(cat)
+    if(name == undefined || cost == undefined || name == "" || cost == ""){
+      Alert.alert(
+        'More Information needed',
+        'Please check input boxes',
+        [
+          {text: 'OK', onPress: () => console.log('OK Pressed')},
+        ],
+        {cancelable: false},
+      );
+    }else{
+      try {
+        if(this.state.lastKey == 0){
+  
+          var objToSave = new SnackItem(name, cost, cat, 'Key'+this.state.lastKey)
+  
+          await AsyncStorage.setItem('Key'+this.state.lastKey, JSON.stringify(objToSave))
+          this.setState({lastKey: this.state.lastKey+1})
+          this.props.navigation.navigate('View', { update: true })
+        }
+        else{
+  
+          var objToSave = new SnackItem(name, cost, cat, 'Key'+this.state.lastKey)
+  
+          await AsyncStorage.setItem('Key'+this.state.lastKey, JSON.stringify(objToSave))
+          this.setState({lastKey: this.state.lastKey+1})
+          this.props.navigation.navigate('View', { update: true })
+        }
+        this.nameinput.clear()
+        this.costinput.clear()
+        this.setState({snackName: "", SnackCost: "", SnackCat: "Chips"})
+        
+      } catch (error) {
+        console.log('error saving')
+        console.log(error)
       }
-      else{
-
-        var objToSave = new SnackItem(name, cost, cat, this.state.keys[this.state.lastKey])
-
-        await AsyncStorage.setItem('Key'+this.state.lastKey, JSON.stringify(objToSave))
-        this.setState({lastKey: this.state.lastKey+1})
-        this.props.navigation.navigate('View', { update: true })
-      }
-      this.nameinput.clear()
-      this.costinput.clear()
-      this.setState({snackName: "", SnackCost: "", SnackCat: "Chips"})
-      
-    } catch (error) {
-      console.log('error saving')
-      console.log(error)
     }
-  };
+  }
 
   _checkKeys = async () => {
 
