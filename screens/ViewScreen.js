@@ -4,7 +4,8 @@ import {
   View, 
   TouchableOpacity,
   Text,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from 'react-native';
 //import AddScreen from './AddScreen';
 import itemsScreen from './ItemsScreens'
@@ -108,10 +109,27 @@ export default class ViewScreen extends React.Component {
         }
     }
     return false;
-  } 
+  }
+
+  _clearClicked = () => {
+    Alert.alert(
+      'You are clearing all data!',
+      'Do you really want to clear all data?',
+      [
+        {text: 'Yes', onPress: () => this._clearData()},
+        {
+          text: 'No',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: true},
+    );
+  }
 
   _clearData = async () => {
     console.log('clear clicked')
+
     try {
       await AsyncStorage.clear()
       this.props.navigation.navigate('Add', { update: true })
@@ -170,7 +188,7 @@ export default class ViewScreen extends React.Component {
           <Text style={styles.buttonText}>Refresh</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => this._clearData()} style={styles.Btn}>
+          <TouchableOpacity onPress={() => this._clearClicked()} style={styles.Btn}>
           <Text style={styles.buttonText}>Clear All</Text>
           </TouchableOpacity>
 
