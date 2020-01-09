@@ -35,7 +35,6 @@ export default class ViewScreen extends React.Component {
   componentDidUpdate() {
     if(this.state.update){
       this._retrieveData();
-      console.log("comp updated!")
       this.setState({update: false})
     }
   }
@@ -45,13 +44,21 @@ export default class ViewScreen extends React.Component {
 
       const keyvalues = await AsyncStorage.getAllKeys()
 
+      var index = keyvalues.indexOf("categories");
+      if (index > -1) {
+        keyvalues.splice(index, 1);
+      }
+
+      var index2 = keyvalues.indexOf("alreadyLaunched");
+      if (index2 > -1) {
+        keyvalues.splice(index2, 1);
+      }
+
       let items = []
       let categAdded = []
       let categoryCosts= []
       let categories = 0
       let totalcost = 0
-
-      //console.log(keyvalues)
 
       //get items from asyncstorage and save them to items array
       for(var key of keyvalues){
@@ -80,7 +87,6 @@ export default class ViewScreen extends React.Component {
         }
         categoryCosts.push({x: categAdded[a], y: Math.round(categcost/totalcost*100)})
       }
-      // console.log(categoryCosts)
     
       this.setState({CostsbyCateg: categoryCosts})
       this.setState({fetchedItems: items})
@@ -90,15 +96,6 @@ export default class ViewScreen extends React.Component {
       console.log('error loading')
       console.log(error)
     }
-
-    // AsyncStorage.getAllKeys().then((keys) => {
-    //   return AsyncStorage.multiGet(keys)
-    //     .then((result) => {
-    //       console.log(result);
-    //     }).catch((e) =>{
-    //       console.log(e);
-    //     });
-    // });
   }
 
   eleContainsInArray(arr,element){
@@ -128,10 +125,20 @@ export default class ViewScreen extends React.Component {
   }
 
   _clearData = async () => {
-    console.log('clear clicked')
 
     try {
-      await AsyncStorage.clear()
+      let keys = await AsyncStorage.getAllKeys()
+      var index = keys.indexOf("categories");
+      if (index > -1) {
+        keys.splice(index, 1);
+      }
+
+      var index2 = keys.indexOf("alreadyLaunched");
+      if (index2 > -1) {
+        keys.splice(index, 1);
+      }
+
+      await AsyncStorage.multiRemove(keys)
       this.props.navigation.navigate('Add', { update: true })
       this.setState({lastKey: 0, keysRounded: false, fetchedItems: []})
       this._retrieveData();
@@ -157,7 +164,7 @@ export default class ViewScreen extends React.Component {
     return (
       <View style={styles.container}>
         <NavigationEvents
-        onDidFocus={() => this.setState({ update: this.props.navigation.getParam('data', {}) })}
+        onDidFocus={() => this.setState({ update: this.props.navigation.getParam('data', true) })}
       />
       {
         <View style={styles.PieArea}>
@@ -184,12 +191,9 @@ export default class ViewScreen extends React.Component {
       }
 
         <View style={styles.Btnarea}>
-          <TouchableOpacity onPress={() => this._retrieveData()} style={styles.Btn}>
-          <Text style={styles.buttonText}>Refresh</Text>
-          </TouchableOpacity>
 
           <TouchableOpacity onPress={() => this._clearClicked()} style={styles.Btn}>
-          <Text style={styles.buttonText}>Clear All</Text>
+          <Text style={styles.buttonText}>Delete All</Text>
           </TouchableOpacity>
 
         </View>
@@ -250,22 +254,3 @@ const styles = StyleSheet.create({
     backgroundColor: 'orange',
   },
 });
-
-
-/*
-<View style={styles.list}>
-          <ScrollView>
-
-              {this.state.fetchedItems.map((item, index) => {
-                return (
-                    <View key={index} style={styles.listcont}>
-                      <Text style={{flex: 1, alignSelf: 'flex-start'}}>Name: {item.name}</Text>
-                      <Text style={{flex: 1, alignSelf: 'center'}}>Cost: {item.cost}</Text>
-                      <Text style={{flex: 1, alignSelf: 'flex-end'}}>Category: {item.categ}</Text>
-                    </View>
-                )
-              })}
-              
-          </ScrollView>
-        </View>
-*/

@@ -17,6 +17,9 @@ const HomeStack = createStackNavigator(
   {
     Home: AddScreen,
   },
+  {
+    headerMode: 'none',
+  },
   config
 );
 
@@ -40,6 +43,9 @@ const LinksStack = createStackNavigator(
   {
     Links: ViewScreen,
   },
+  {
+    headerMode: 'none',
+  },
   config
 );
 
@@ -55,6 +61,9 @@ LinksStack.path = '';
 const SettingsStack = createStackNavigator(
   {
     Settings: CategoryScreen,
+  },
+  {
+    headerMode: 'none',
   },
   config
 );
