@@ -14,8 +14,21 @@ import {
 import { SnackItem } from '../components/SnackItem.js';
 import { NavigationEvents } from 'react-navigation';
 
+/**
+ * Add-tab view. 
+ * Add-tab uses AsyncStorage and saves SnackItem.js objects to it.
+ */
 export default class AddScreen extends React.Component {
 
+  /**
+   * Constructor.
+   * Unused states: KeysRounded, fetchedItems.
+   * State holds what was latest key to save object in AsyncStorage, all keys, 
+   * Caterogy of snack where object should be saved, is user launching app first time and 
+   * should view update itself.
+   * 
+   * @param props properties of Class
+   */
   constructor(props){
     super(props);
     this.state = {
@@ -30,24 +43,38 @@ export default class AddScreen extends React.Component {
     }
   }
 
+  /**
+   * Function to get all gategories from AsyncStorage and set those into State.
+   */
   _getCategories = async () => {
     let fetchCategories = JSON.parse(await AsyncStorage.getItem('categories'))
 
     this.setState({categories: fetchCategories});
   }
 
+  /**
+   * Function to initialize Gategories to AsyncStorage to state 
+   * if user is launching app first time.
+   */
   _setCategories = async () => {
     let setupCategories = ["Chips", "Sweets", "Nuts"]
     await AsyncStorage.setItem('categories', JSON.stringify(setupCategories))
     this.setState({categories: setupCategories});
   }
 
+  /**
+   * LifeCycle Function.
+   * When Components mounts it checks is this first launch and should it get categories or initialize them,
+   * after that get's all keys from AsyncStorage and excludes first launch and gategories keys to check what
+   * should be next Key to object that is used to save object. 
+   */
   async componentDidMount(){
 
+    // Check is this first launch
     try{
       AsyncStorage.getItem("alreadyLaunched").then(value => {
         if(value == null){
-          AsyncStorage.setItem('alreadyLaunched', JSON.stringify(true)); // No need to wait for `setItem` to finish, although you might want to handle errors
+          AsyncStorage.setItem('alreadyLaunched', JSON.stringify(true))
           this.setState({firstLaunch: true});
           this._setCategories()
         }
@@ -60,6 +87,9 @@ export default class AddScreen extends React.Component {
       console.log(error)
     }
 
+    //Get all keys and decide what should be next key to save object to asyncStorage
+    //Exclude categories and first launch key out of it and call _getCategories
+    //unction to update categories Picker.
     try{
 
       const checkkeys =  await AsyncStorage.getAllKeys()
@@ -90,9 +120,18 @@ export default class AddScreen extends React.Component {
     }
   }
 
+  /**
+   * LifeCycle Function.
+   * If view should update itself check and decide next key to object and call _getCategories
+   * function to update categories Picker.
+   */
   async componentDidUpdate() {
 
     if(this.state.update){
+
+      //Get all keys and decide what should be next key to save object to asyncStorage
+      //Exclude categories and first launch key out of it and call _getCategories
+      //unction to update categories Picker.
       try{
         this.setState({update: false})
         const checkkeys =  await AsyncStorage.getAllKeys()
@@ -121,7 +160,20 @@ export default class AddScreen extends React.Component {
     }
   }
 
+  /**
+   * Function to save object to AsyncStorage.
+   * 
+   * Checks that user have given input to TextInputs and saves object to AsyncStorage
+   * and increases state lastKey by one that is used to next object. Clears TextInputs
+   * and sets state where they refer to empty string.
+   * 
+   * @param name name of object that should be saved 
+   * @param cost cost of object that should be saved 
+   * @param cat category of object that should be saved 
+   */
   _storeData = async (name, cost, cat) => {
+
+    //Chekc does user have given input if not -> Alert
     if(name == undefined || cost == undefined || cat == undefined || name == "" || cost == "" || cat == ""){
       Alert.alert(
         'More Information needed',
@@ -131,7 +183,9 @@ export default class AddScreen extends React.Component {
         ],
         {cancelable: false},
       );
-    }else{
+    }
+    //else save object.
+    else{
       try {
         if(this.state.lastKey == 0){
   
@@ -160,6 +214,11 @@ export default class AddScreen extends React.Component {
     }
   }
 
+  /**
+   * Debug Function to check all keys and last key of AsyncStorage.
+   * 
+   * Not Used.
+   */
   _checkKeys = async () => {
 
     try{
@@ -172,8 +231,9 @@ export default class AddScreen extends React.Component {
     }
   }
 
-
   render(){
+
+    //Generate items to Picker Element from state Category
     let pickerItems = this.state.categories.map( (s, i) => {
       return <Picker.Item key={i} value={s} label={s} />
     });

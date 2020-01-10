@@ -13,8 +13,21 @@ import { VictoryPie } from 'victory-native';
 import { Svg } from 'react-native-svg'
 import { NavigationEvents } from 'react-navigation';
 
+/**
+ * View-tab view. 
+ * View-tab uses VictoryPie to show user pie chart of saved objects in AsyncStorage.
+ */
 export default class ViewScreen extends React.Component {
 
+  /**
+   * Constructor.
+   * Unused states: KeysRounded
+   * State holds what was latest key to save object in AsyncStorage, all keys, 
+   * all items, cost of every category and
+   * should view update itself.
+   * 
+   * @param props properties of Class
+   */
   constructor(props){
     super(props);
     this.state = {
@@ -28,10 +41,19 @@ export default class ViewScreen extends React.Component {
     this.eleContainsInArray = this.eleContainsInArray.bind(this);
   }
 
+  /**
+   * LifeCycle Function.
+   * When component mounts call _retrieveData function to get object from AsyncStorage.
+   */
   async componentDidMount(){
     this._retrieveData();
   }
 
+  /**
+   * LifeCycle Function.
+   * If view should update itself call _retrieveData function to get object from AsyncStorage and set 
+   * update state to false.
+   */
   componentDidUpdate() {
     if(this.state.update){
       this._retrieveData();
@@ -39,9 +61,15 @@ export default class ViewScreen extends React.Component {
     }
   }
 
+  /**
+   * Function to Fetch object from AsyncStorage.
+   * Function fecthes Saved objects from AsyncStorage and initializes categories and 
+   * cost of every categories to VictoryPie.
+   */
   _retrieveData = async () => {
     try {
 
+      //Get all keys from Async Storage and Exclude categories and firstlaunch.
       const keyvalues = await AsyncStorage.getAllKeys()
 
       var index = keyvalues.indexOf("categories");
@@ -53,6 +81,7 @@ export default class ViewScreen extends React.Component {
       if (index2 > -1) {
         keyvalues.splice(index2, 1);
       }
+
 
       let items = []
       let categAdded = []
@@ -98,6 +127,14 @@ export default class ViewScreen extends React.Component {
     }
   }
 
+  /**
+   * Function to check is element in array.
+   * 
+   * @param arr array to go through
+   * @param element element to check
+   * 
+   * @returns boolean. True if element is in array if not then false.
+   */
   eleContainsInArray(arr,element){
     if(arr != null && arr.length >0){
         for(var i=0;i<arr.length;i++){
@@ -108,6 +145,11 @@ export default class ViewScreen extends React.Component {
     return false;
   }
 
+  /**
+   * Function to ensure that user wants to clear all items from AsyncStorage.
+   * Displays Alert to user to ask is user sure to delete all items in AsyncStorage
+   * calls _clearData() function if user is wants to clear AsyncStorage.
+   */
   _clearClicked = () => {
     Alert.alert(
       'You are clearing all data!',
@@ -124,10 +166,18 @@ export default class ViewScreen extends React.Component {
     );
   }
 
+  /**
+   * Function to delete all snacks in AsyncStorage.
+   * Function gets all keys from AsyncStorage and only includes snack keys
+   * to multiremove them from AsyncStorage
+   */
   _clearData = async () => {
 
     try {
+      //get all keys
       let keys = await AsyncStorage.getAllKeys()
+
+      //exclude categories and alreadylaunched
       var index = keys.indexOf("categories");
       if (index > -1) {
         keys.splice(index, 1);
@@ -138,6 +188,7 @@ export default class ViewScreen extends React.Component {
         keys.splice(index, 1);
       }
 
+      //multiremove snacks from AsyncStorage and reset states to empty/0.
       await AsyncStorage.multiRemove(keys)
       this.props.navigation.navigate('Add', { update: true })
       this.setState({lastKey: 0, keysRounded: false, fetchedItems: []})
@@ -148,10 +199,21 @@ export default class ViewScreen extends React.Component {
     }
   }
 
+  /**
+   * Unused function to get costs of Categories
+   */
   _getSeries = () => {
     return this.state.CostsbyCateg
   }
 
+  /**
+   * Function to open ItemsScreen.
+   * 
+   * Opens ItemsScreen.js view and passes category and all objects to it.
+   * 
+   * @param catName name of category
+   * @param items all snack items
+   */
   _openItemsCategory = (catName, items) => {
     this.props.navigation.navigate('Items', {
       category: catName,

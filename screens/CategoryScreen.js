@@ -13,8 +13,20 @@ import {
 import Constants from 'expo-constants';
 import { NavigationEvents } from 'react-navigation';
 
+/**
+ * Category-tab view. 
+ * Category-tab shows user categories where user can save objects and user can
+ * delete them or add more.
+ */
 export default class CategoryScreen extends React.Component {
 
+  /**
+   * Constructor.
+   * 
+   * State categories to save defined categories in AsyncStorage.
+   * 
+   * @param props properties of Class
+   */
   constructor(props){
     super(props);
     this.state = {
@@ -23,11 +35,20 @@ export default class CategoryScreen extends React.Component {
     }
   }
 
+  /**
+   * LifeCycle Function.
+   * When component mounts fetch all categories from AsyncStorage and set them to state.
+   */
   async componentDidMount(){
     let items = JSON.parse(await AsyncStorage.getItem('categories'))
     this.setState({ categories: items})
   }
 
+  /**
+   * LifeCycle Function.
+   * If view should update itself fetch all categories from AsyncStorage and set them to state and
+   * update state to false.
+   */
   async componentDidUpdate() {
     if(this.state.update){
       let items = JSON.parse(await AsyncStorage.getItem('categories'))
@@ -35,6 +56,11 @@ export default class CategoryScreen extends React.Component {
     }
   }
 
+  /**
+   * Function to ensure that user wants to delete category from AsyncStorage.
+   * Displays Alert to user to ask is user sure to deleting Category from AsyncStorage
+   * calls _deleteCategory() function if user is wants to delete category from AsyncStorage.
+   */
   _deleteClick = (item) => {
     Alert.alert(
       'You are deleting category!',
@@ -51,8 +77,17 @@ export default class CategoryScreen extends React.Component {
     );
   }
 
+  /**
+   * Function to delete category from AsyncStorage
+   * 
+   * Function gets all categories from state and removes selected category from array, 
+   * then saves that array to state and to Asyncstorage.
+   * 
+   * @param item name of category to be deleted
+   */
   _deleteCategory = async (item) => {
 
+    //get all gatecories and remove selected item from there
     let newList = this.state.categories
 
     var index = newList.indexOf(item);
@@ -77,6 +112,7 @@ export default class CategoryScreen extends React.Component {
     this.setState({categories: newList})
 
 
+    //save new array that doesn't contain deleted category to AsyncStorage
     try {
 
       await AsyncStorage.setItem('categories', JSON.stringify(newList))
@@ -90,7 +126,17 @@ export default class CategoryScreen extends React.Component {
 
   }
 
+  /**
+   * Function to save category to AsyncStorage
+   * 
+   * Function gets all categories from state and save new category from array, 
+   * then saves that array to state and to Asyncstorage.
+   * 
+   * @param item name of category to be saved
+   */
   _addCategory = async (name) => {
+
+    //check user input
     if(name == undefined ||  name == "" ){
       Alert.alert(
         'More Information needed',
@@ -100,7 +146,9 @@ export default class CategoryScreen extends React.Component {
         ],
         {cancelable: false},
       );
-    }else{
+    }
+    //get gategories from state and add new category then save it to state and AsynStorage
+    else{
       try {
         let newList = this.state.categories
         newList.push(name)
