@@ -1,6 +1,6 @@
 # Snack-Buddy
 
-React native app where user can save what kind of snacks they
+React native app where user can save what kind of snacks they've bought
 
 ## Table of contents
 
@@ -36,4 +36,10 @@ React native app where user can save what kind of snacks they
 * Categories
 
 ![Categories](https://github.com/Sakkendalen/Snack-Buddy/blob/master/images/4.png)
+
+## Status
+Project is: finished
+project and depencies is outdated. Should be updated to work correctly
+
+
 
