@@ -40,7 +40,7 @@ React native app where user can save what kind of snacks they've bought
 ## Status
 Project is: finished <br />
 
-project and depencies is outdated. Should be updated for app to work properly.
+***project and depencies is outdated. Should be updated for app to work properly.***
 
 
 
