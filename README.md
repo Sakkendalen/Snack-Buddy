@@ -38,7 +38,7 @@ React native app where user can save what kind of snacks they've bought
 ![Categories](https://github.com/Sakkendalen/Snack-Buddy/blob/master/images/4.png)
 
 ## Status
-Project is: finished < br />
+Project is: finished < br \>
 project and depencies is outdated. Should be updated for app to work properly.
 
 
