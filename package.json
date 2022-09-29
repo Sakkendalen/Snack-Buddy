@@ -28,7 +28,7 @@
     "react-native-svg": "^9.13.6",
     "react-native-web": "^0.11.7",
     "react-navigation": "^3.12.0",
-    "victory-native": "^33.0.1"
+    "victory-native": "^36.6.8"
   },
   "devDependencies": {
     "babel-preset-expo": "^7.0.0",
